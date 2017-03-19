@@ -1,7 +1,10 @@
 d3.quakeMap = function(options) {
 
   var mapDivTag = options.mapDivTag === undefined ? 'map' : options.mapDivTag
-    , numDays = options.numDays < 1 | options.numDays // number of days worth of earthquakes to display
+    , quakeEndDate = options.quakeEndDate === undefined ? new Date() : options.quakeEndDate
+    , numDays = options.numDays < 1 ? 1 : options.numDays // number of days worth of earthquakes to display
+    , mapCenter = options.mapCenter === undefined ? [47.598877, -122.330916] : options.mapCenter
+    , mapZoomLevel = options.mapZoomLevel === undefined ? 5 : options.mapZoomLevel
     , timeOut = null // timeout function to prevent map from repeatedly updating upon resize
     // --- leaflet stuff ---
     , leafletmap // the leaflet map
@@ -24,6 +27,12 @@ d3.quakeMap = function(options) {
                       .range([1,1,1.5,3,4.5,6,7.5,9,13.5]);
 
   function my() {
+    // because we're doing a time series, we must remove all of the existing
+    // earthquakes in order for the time sequence to be valid
+    svg.select("g")
+        .selectAll("circle")
+        .remove();
+    
     // DRAW EARTHQUAKES 
     var eqQuery = earthquakeURLMapBounds(86400 * numDays); // 86400 seconds = 1 day, so query for past day's earthquakes
     d3.json(eqQuery, function(err, json) {
@@ -65,12 +74,6 @@ d3.quakeMap = function(options) {
         .style("left", topLeft[0] + "px")
         .style("top", topLeft[1] + "px");
       
-      // because we're doing a time series, we must remove all of the existing
-      // earthquakes in order for the time sequence to be valid
-      var g = svg.select("g")
-                  .selectAll("circle")
-                  .remove();
-      
       // add the new earthquake series
       svg.select("g")
         .selectAll("circle")
@@ -100,6 +103,16 @@ d3.quakeMap = function(options) {
     });      
   }
 
+  // edit the last day of quake values 
+  my.quakeEndDate = function(value) {
+    if( !arguments.length ) return quakeEndDate;
+
+    quakeEndDate = value;
+    if( typeof onMapMoveZoom === 'function' ) onMapMoveZoom();
+
+    return my;
+  };
+
   // edit the number of days for the active chart
   my.numDays = function(value) {
     if( !arguments.length ) return numDays;
@@ -110,6 +123,38 @@ d3.quakeMap = function(options) {
     return my;
   };
 
+  my.mapCenter = function(value) {
+    if( !arguments.length ) return mapCenter;
+
+    mapCenter = value;
+    if( leafletmap !== undefined ) {
+      leafletmap.flyTo(mapCenter,mapZoomLevel,
+                          { "animate": true,
+                          "pan": {
+                              "duration": 5 
+                            }
+                          }
+                        );
+    }
+    return my;
+  };
+
+  my.mapZoomLevel = function(value) {
+    if( !arguments.length ) return mapZoomLevel;
+
+    mapZoomLevel = value;
+    if( leafletmap !== undefined ) {
+      leafletmap.flyTo(mapCenter,mapZoomLevel,
+                          { "animate": true,
+                          "pan": {
+                              "duration": 5 
+                            }
+                          }
+                        );
+    }
+
+    return my;
+  };
 
   // function using leaflet's functions to convert from lat/long to points in the map
   // we do this to allow leaflet to govern the map projection, which we will overlay
@@ -120,10 +165,11 @@ d3.quakeMap = function(options) {
   }
 
   // builds a magnitude legend on top of a legend SVG
-  function addMagnitudeLegend(theMap)
+  function addMagnitudeLegend()
   {
     
-    d3.select("#mapLegend").remove(); // select any old map legend and remove it
+    d3.select("#mapLegend")
+      .remove(); // select any old map legend and remove it
     // create a list of objects representing a legend entry
     // so we can add x,y coordinates to each object and apply text
     // to each magnitude circle:
@@ -200,9 +246,12 @@ d3.quakeMap = function(options) {
     // CREATE MAP
     // set view to Seattle Area 
     leafletmap = new L.map(mapDivTag) 
-                    .setView([47.598877, -122.330916], 5);
+                    .setView(mapCenter,mapZoomLevel);
     leafletmap.options.maxZoom = 11;
-    leafletmap.options.minZoom = 3;
+    // min zoom set relatively low because USGS quake feed doesn't allow
+    // spanning more than 360 degrees of longitude, which gets queried
+    // when the view is zoomed way out
+    leafletmap.options.minZoom = 3; 
     
     // background tile layer from: https://leaflet-extras.github.io/leaflet-providers/preview/
     var Esri_OceanBasemap =  L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
@@ -223,7 +272,7 @@ d3.quakeMap = function(options) {
     // set up an array of strings to form a query (will join later with ?'s)
     var query = [ "https://earthquake.usgs.gov/fdsnws/event/1/query&format=geojson" ];
     
-    var endtime = new Date();
+    var endtime = quakeEndDate; 
     var starttime = new Date(endtime.getTime() - secondsSinceNow * 1000);
     
     query.push("starttime=" + starttime.toISOString() );
@@ -245,21 +294,12 @@ d3.quakeMap = function(options) {
     return query.join("&");
   }
 
-  function resizeMap() {
-    if (timeOut !== null)
-      clearTimeout(timeOut);
-
-    timeOut = setTimeout(function(){
-      addMagnitudeLegend();
-      my();
-    }, 500);
-  }
-
   function onMapMoveZoom() {
     if (timeOut !== null)
       clearTimeout(timeOut);
 
     timeOut = setTimeout(function(){
+      addMagnitudeLegend();
       my();
     }, 500);
   }
@@ -274,12 +314,12 @@ d3.quakeMap = function(options) {
 
     // Re-draw on reset, this keeps the markers where they should be on reset/zoom
     leafletmap.on("moveend", onMapMoveZoom);
-    window.addEventListener("resize", resizeMap);
 
     // add some earthquakes!
-    resizeMap();
+    onMapMoveZoom();
   }
 
+  // build the base level map!
   init();
 
   return my;
