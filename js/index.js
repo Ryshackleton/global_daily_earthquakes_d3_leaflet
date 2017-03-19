@@ -38,7 +38,7 @@ var quakeViews = [
       divId: 'valdivia-1960', 
       params: 
         {
-          label: "M9.5 1960 Chilean Earthquake",
+          label: "M9.5 1960 Chilean Earthquake and the following 3 days",
           center: [-39.827338, -73.247785],
           zoom: 6,
           days: 4,
