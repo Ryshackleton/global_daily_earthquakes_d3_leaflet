@@ -35,6 +35,8 @@ d3.quakeMap = function(options) {
   }
 
   function my() {
+
+    removeEarthquakeCircles();
     
     // DRAW EARTHQUAKES 
     var eqQuery = earthquakeURLMapBounds(86400 * numDays); // 86400 seconds = 1 day, so query for past day's earthquakes
