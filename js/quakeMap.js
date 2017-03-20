@@ -60,7 +60,7 @@ d3.quakeMap = function(options) {
       // extra radius of the earthquake's size scale, otherwise
       // earthquake circles will be cut off near the edges of the SVG
       // we'll use the largest earthquake size to govern this padding value
-      var svgPadding = d3.max(eqSizeScale.range());  
+      var svgPadding = d3.max(eqSizeScale.range()) * 1.10;  
       
       // get the top left and bottom right as [x,y] arrays,
       // AND add in some padding to allow for the extra earthquake scale
