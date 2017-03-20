@@ -26,12 +26,15 @@ d3.quakeMap = function(options) {
                       .domain(eqDomain)
                       .range([1,1,1.5,3,4.5,6,7.5,9,13.5]);
 
-  function my() {
+  function removeEarthquakeCircles() {
     // because we're doing a time series, we must remove all of the existing
     // earthquakes in order for the time sequence to be valid
     svg.select("g")
         .selectAll("circle")
         .remove();
+  }
+
+  function my() {
     
     // DRAW EARTHQUAKES 
     var eqQuery = earthquakeURLMapBounds(86400 * numDays); // 86400 seconds = 1 day, so query for past day's earthquakes
@@ -103,6 +106,14 @@ d3.quakeMap = function(options) {
     });      
   }
 
+  // get/set the leaflet map
+  my.leafletmap = function(value) {
+    if( !arguments.length ) return leafletmap;
+
+    leafletmap = value;
+    return my;
+  };
+
   // edit the last day of quake values 
   my.quakeEndDate = function(value) {
     if( !arguments.length ) return quakeEndDate;
@@ -167,9 +178,9 @@ d3.quakeMap = function(options) {
   // builds a magnitude legend on top of a legend SVG
   function addMagnitudeLegend()
   {
-    
     d3.select("#mapLegend")
       .remove(); // select any old map legend and remove it
+    
     // create a list of objects representing a legend entry
     // so we can add x,y coordinates to each object and apply text
     // to each magnitude circle:
@@ -314,6 +325,7 @@ d3.quakeMap = function(options) {
 
     // Re-draw on reset, this keeps the markers where they should be on reset/zoom
     leafletmap.on("moveend", onMapMoveZoom);
+    leafletmap.on("movestart", removeEarthquakeCircles);
 
     // add some earthquakes!
     onMapMoveZoom();
