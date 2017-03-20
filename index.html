@@ -1,53 +1,89 @@
 <!DOCTYPE html>
-<head>
-  <meta charset="UTF-8">
-  <title>Recent Earthquakes Animation using D3.js</title>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Earthquake Visualizations</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/styles.css" rel="stylesheet">
+		<link href="css/quakeMap.css" rel="stylesheet">
+      <!-- leaflet stylesheet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<body>
 
-  <link rel="stylesheet" href="css/style.css">
+<!-- bootstrap template -->
+<div class="navbar navbar-custom navbar-fixed-top">
+ <div class="navbar-header" ><a class="navbar-brand" id="events-title">Current Visualization</a>
+<!--
+      <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">Link</a></li>
+        <li>&nbsp;</li>
+      </ul>
+-->
+    </div>
+</div>
 
-  <style>
-    h2, h4 {
-      display: inline;
-    }
 
-    .center-70 {
-      margin: auto;
-      width: 70%;
-      text-align: center;
-    }
-  </style>
+<!-- div to contain the leaflet map -->
+<div id="map-canvas"></div>
+
+<!-- sidebar -->
+<div class="container-fluid" id="main">
+  <div class="row">
+  	<div class="col-xs-4" id="left">
     
+      <h3>Earthquake sequences:</h3>
+      
+      <!-- item list (built by index.js with the views and earthquake sequences) -->
+      <div id=earthquake-view-list></div>
+      <!-- /item list -->
+      
+      <p>
+      <a href="https://github.com/Ryshackleton/global_daily_earthquakes_d3_leaflet">Source Code</a>
+      </p>
+      
+      <hr> 
+        
+      <p>
+      <a href="https://github.com/Ryshackleton/" target="_ext" class="center-block btn btn-primary">Author Profile</a>
+      </p>
+        
+      <hr>      
 
-  <!-- d3.js version 3.5.16, and topojson -->
-  <script src="https://d3js.org/d3.v4.min.js"></script> 
-  <script src="https://d3js.org/topojson.v1.min.js"></script>
-  
-  
-    <!-- leaflet stylesheet and js script -->
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    </div>
+    <div class="col-xs-4"><!--map-canvas will be postioned here--></div>
+    
+  </div>
+</div>
+<!-- end template -->
 
-  <!-- earthquake slippy map module -->
-  <script src="js/quakeMap.js"></script>
- 
-</head>
-  
-<body>
+	<!-- script references -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
 
-  <!-- titles, etc -->
-  <div class=center-70><h2 id='events-title'>Earthquakes in the last 24 hours</h2></div>
-  <div class=center-70><h4>Real time data courtesy of the <a href='https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php' target='_blank'>USGS</a></h4></div>
+    <!-- d3.js version 4, and topojson -->
+    <script src="https://d3js.org/d3.v4.min.js"></script> 
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    
+      <!-- leaflet js script -->
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    
+    <!-- earthquake slippy map module -->
+    <script src="js/quakeMap.js"></script>
 
-  <!-- div for  some buttons with earthquake views -->
-  <div id=earthquake-view-list class=center-70></div>
+    <!-- main script to load this page and build the map and earthquake views -->
+		<script src="js/index.js"></script>
 
-  <!-- div for the map -->
-  <div id='theMap'></div>
-
-  <!-- main script for this animation -->
-  <script src="js/index.js"></script>
-</body>
+	</body>
 </html>
