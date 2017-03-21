@@ -9,6 +9,7 @@ window.onload = function () {
   };
 
   var quakemap = new d3.quakeMap(options);
+  quakemap.init();
 
   // build a button and a click response for each view
   // (attached to a div with id='earthquake-view-list'
