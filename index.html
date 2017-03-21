@@ -69,18 +69,25 @@
 <!-- end template -->
 
 	<!-- script references -->
+    <!-- UI - bootstrap and jQuery -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 
-    <!-- d3.js version 4, and topojson -->
+    <!-- D3.js version 4, and topojson for earthquake parsing/rendering -->
     <script src="https://d3js.org/d3.v4.min.js"></script> 
     <script src="https://d3js.org/topojson.v1.min.js"></script>
     
-      <!-- leaflet js script -->
+      <!-- leaflet js script to build the slippy map -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    
-    <!-- earthquake slippy map module -->
+
+    <!-- module for querying the USGS earthquake REST API -->
+    <script src="js/usgsQuery.js"></script>
+    <!-- customized D3 earthquake overlay on slippy map module -->
     <script src="js/quakeMap.js"></script>
+
+    <!-- list of different earthquake sequences defined by date, location,
+         and zoom level -->
+    <script src="js/quakeViewList.js"></script>
 
     <!-- main script to load this page and build the map and earthquake views -->
     <script src="js/index.js"></script>

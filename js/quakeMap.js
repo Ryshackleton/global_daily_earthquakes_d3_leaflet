@@ -26,20 +26,65 @@ d3.quakeMap = function(options) {
                       .domain(eqDomain)
                       .range([1,1,1.5,3,4.5,6,7.5,9,13.5]);
 
+  function init() {
+    //  create a d3.geo.path to convert GeoJSON to SVG (in d3 version 4, d3.geo.path becomes d3.geoPath)
+    // this is used to calculate a bounding box for the earthquakes below
+    var transform = d3.geoTransform({point: projectPoint});
+    path = d3.geoPath().projection(transform);
+
+    // CREATE MAP
+    // set view to Seattle Area 
+    leafletmap = new L.map(mapDivTag) 
+                    .setView(mapCenter,mapZoomLevel);
+    leafletmap.options.maxZoom = 11;
+    // min zoom set relatively low because USGS quake feed doesn't allow
+    // spanning more than 360 degrees of longitude, which gets queried
+    // when the view is zoomed way out
+    leafletmap.options.minZoom = 3; 
+    
+    // background tile layer from: https://leaflet-extras.github.io/leaflet-providers/preview/
+    var Esri_OceanBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+      maxZoom: 13
+    }).addTo(leafletmap);
+    
+    // APPEND the SVG to the Leaflet map pane
+    svg = d3.select(leafletmap.getPanes().overlayPane).append("svg")
+            .attr("class", "leaflet-zoom-hide");
+    // g (group) element will be inside the svg, and will contain the earthquakes
+    svg.append("g")
+       .attr("class", "leaflet-zoom-hide");
+
+    // SETUP TRIGGERS
+    // Re-draw on reset, this keeps the markers where they should be on reset/zoom
+    leafletmap.on("moveend", onMapMoveZoom);
+    leafletmap.on("movestart", removeEarthquakeCircles);
+
+    // add some earthquakes!
+    onMapMoveZoom();
+  }
+
+  // build the base level map!
+  init();
+
   function removeEarthquakeCircles() {
-    // because we're doing a time series, we must remove all of the existing
-    // earthquakes in order for the time sequence to be valid
     svg.select("g")
         .selectAll("circle")
         .remove();
   }
 
-  function my() {
-
+  function renderEarthquakes() {
+    // because we're doing a time series, we must remove all of the existing
+    // earthquakes in order for the time sequence to be valid
     removeEarthquakeCircles();
     
     // DRAW EARTHQUAKES 
-    var eqQuery = earthquakeURLMapBounds(86400 * numDays); // 86400 seconds = 1 day, so query for past day's earthquakes
+
+   // build a query using the usgsQuery module
+    var queryOptions = { endtime: quakeEndDate, 
+                               numSeconds: 86400 * numDays, // 86400 seconds = 1 day, so query for past day's earthquakes
+                               leafletmap: leafletmap };
+    var eqQuery = usgsQuery.earthquakeURLMapBoundsJSON(queryOptions); 
     d3.json(eqQuery, function(err, json) {
      if (err) {
         throw err;
@@ -106,6 +151,12 @@ d3.quakeMap = function(options) {
                   return eqColorScale(d.properties.mag);
               });
     });      
+
+  }
+
+
+  function my() {
+    renderEarthquakes();
   }
 
   // get/set the leaflet map
@@ -255,86 +306,15 @@ d3.quakeMap = function(options) {
                                      + (d.y-15) + ")"; });
   }
 
-  function buildLeafletMap() {
-    // CREATE MAP
-    // set view to Seattle Area 
-    leafletmap = new L.map(mapDivTag) 
-                    .setView(mapCenter,mapZoomLevel);
-    leafletmap.options.maxZoom = 11;
-    // min zoom set relatively low because USGS quake feed doesn't allow
-    // spanning more than 360 degrees of longitude, which gets queried
-    // when the view is zoomed way out
-    leafletmap.options.minZoom = 3; 
-    
-    // background tile layer from: https://leaflet-extras.github.io/leaflet-providers/preview/
-    var Esri_OceanBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-      maxZoom: 13
-    }).addTo(leafletmap);
-    
-    // append the SVG to the Leaflet map pane
-    svg = d3.select(leafletmap.getPanes().overlayPane).append("svg")
-            .attr("class", "leaflet-zoom-hide");
-    // g (group) element will be inside the svg, and will contain the earthquakes
-    svg.append("g")
-       .attr("class", "leaflet-zoom-hide");
-  }
-
-  function earthquakeURLMapBounds(secondsSinceNow) {
-    
-    // set up an array of strings to form a query (will join later with ?'s)
-    var query = [ "https://earthquake.usgs.gov/fdsnws/event/1/query&format=geojson" ];
-    
-    var endtime = quakeEndDate; 
-    var starttime = new Date(endtime.getTime() - secondsSinceNow * 1000);
-    
-    query.push("starttime=" + starttime.toISOString() );
-    query.push("endtime=" + endtime.toISOString() );
-    
-    var bnds = leafletmap.getBounds();
-    
-    var minLat = Math.min(bnds.getSouth(),bnds.getNorth());
-    var maxLat = Math.max(bnds.getSouth(), bnds.getNorth());
-    var minLong = Math.min(bnds.getEast(), bnds.getWest());
-    var maxLong = Math.max(bnds.getEast(), bnds.getWest());
-    query.push("minlatitude=" + minLat );
-    query.push("maxlatitude=" + maxLat ); 
-    query.push("minlongitude=" + minLong ); 
-    query.push("maxlongitude=" + maxLong ); 
-    
-    query.push("orderby=time-asc"); // order in time ascending
-    
-    return query.join("&");
-  }
-
   function onMapMoveZoom() {
     if (timeOut !== null)
       clearTimeout(timeOut);
 
     timeOut = setTimeout(function(){
       addMagnitudeLegend();
-      my();
+      renderEarthquakes();
     }, 500);
   }
-
-  function init() {
-    //  create a d3.geo.path to convert GeoJSON to SVG (in d3 version 4, d3.geo.path becomes d3.geoPath)
-    // this is used to calculate a bounding box for the earthquakes below
-    var transform = d3.geoTransform({point: projectPoint});
-    path = d3.geoPath().projection(transform);
-
-    buildLeafletMap();
-
-    // Re-draw on reset, this keeps the markers where they should be on reset/zoom
-    leafletmap.on("moveend", onMapMoveZoom);
-    leafletmap.on("movestart", removeEarthquakeCircles);
-
-    // add some earthquakes!
-    onMapMoveZoom();
-  }
-
-  // build the base level map!
-  init();
 
   return my;
 };
