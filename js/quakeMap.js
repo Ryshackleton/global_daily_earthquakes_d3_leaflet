@@ -125,7 +125,7 @@ d3.quakeMap = function(options) {
     
     // background tile layer from: https://leaflet-extras.github.io/leaflet-providers/preview/
     var Esri_OceanBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+      attribution: 'Tiles &copy; Esri',
       maxZoom: 13
     }).addTo(leafletmap);
 
@@ -133,17 +133,24 @@ d3.quakeMap = function(options) {
     var faults = L.tileLayer("https://earthquake.usgs.gov/basemap/tiles/faults/{z}/{x}/{y}.png", {
       attribution: "<a href=\"https://earthquake.usgs.gov/arcgis/rest/services/eq/map_faults/MapServer\">USGS</a>",
       maxZoom: 13,
-      opacity: 0.75,
+      opacity: 0.5,
     }).addTo(leafletmap);
 
     var plateBoundaries = L.tileLayer("https://earthquake.usgs.gov/basemap/tiles/plates/{z}/{x}/{y}.png", {
       attribution: "<a href=\"https://earthquake.usgs.gov/arcgis/rest/services/eq/map_faults/MapServer\">USGS</a>",
       maxZoom: 13,
-      opacity: 0.7,
+      opacity: 0.5,
     }).addTo(leafletmap);
+    
+    // geology from USGS
+    var geology = L.tileLayer("https://macrostrat.org/api/v2/maps/burwell/emphasized/{z}/{x}/{y}/tile.png", {
+      attribution: "<a href=https://macrostrat.org>Macrostrat.org</a>",
+      maxZoom: 13,
+      opacity: 0.25,
+    });
 
     var baseMaps = { "ESRI Oceans" : Esri_OceanBasemap };
-    var overlayMaps = { "US Faults": faults, "Plate Boundaries": plateBoundaries };
+    var overlayMaps = { "Geology": geology, "US Faults": faults, "Plate Boundaries": plateBoundaries };
 
     L.control.layers(baseMaps,overlayMaps).addTo(leafletmap);
     
