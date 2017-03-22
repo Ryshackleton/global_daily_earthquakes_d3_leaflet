@@ -46,7 +46,7 @@ svg {
 /* border: 1px dotted black; */
 }
 
-/* tooltip style grabbed from leaflet.css:  .leaflet-tooltip style for consitency */
+/* tooltip style grabbed from leaflet.css:  .leaflet-tooltip style for consistency */
 div.tooltip {	
 	position: absolute;
     text-align: center;			
