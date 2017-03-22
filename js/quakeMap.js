@@ -358,7 +358,7 @@ d3.quakeMap = function(options) {
                   .attr("width", lBottomRight[0] - lTopLeft[0] + 2*lPadding +"px")
                   // height is slightly larger to account for the attribution pane
                   // at the bottom right, which spills into the left bottom corner
-                  .attr("height", lBottomRight[1] - lTopLeft[1] + 6*lPadding + "px");
+                  .attr("height", lBottomRight[1] - lTopLeft[1] + 2*lPadding + "px");
   
     // g (group) element will be inside the legend svg, and will contain 
     // a bounding rectangle, some circles representing earthquake sizes, and text
