@@ -14,6 +14,7 @@ d3.quakeMap = function(options) {
     // --- D3 stuff ---
     , svg // save a selection for the svg within the map
     , path // used to collect the bounding box, in svg space, of objects on the map
+    , popupDiv // div to attach a popup to display earthquake info
     // color scale for the earthquakes
     // color scale from: http://colorbrewer2.org/?type=sequential&scheme=OrRd&n=9
     , eqDomain = [-1, 0, 1, 2, 3, 4, 5, 6, 9 ]
@@ -127,6 +128,24 @@ d3.quakeMap = function(options) {
       attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
       maxZoom: 13
     }).addTo(leafletmap);
+
+    // faults from USGS earthquakes hazards website
+    var faults = L.tileLayer("https://earthquake.usgs.gov/basemap/tiles/faults/{z}/{x}/{y}.png", {
+      attribution: "<a href=\"https://earthquake.usgs.gov/arcgis/rest/services/eq/map_faults/MapServer\">USGS</a>",
+      maxZoom: 13,
+      opacity: 0.75,
+    }).addTo(leafletmap);
+
+    var plateBoundaries = L.tileLayer("https://earthquake.usgs.gov/basemap/tiles/plates/{z}/{x}/{y}.png", {
+      attribution: "<a href=\"https://earthquake.usgs.gov/arcgis/rest/services/eq/map_faults/MapServer\">USGS</a>",
+      maxZoom: 13,
+      opacity: 0.7,
+    }).addTo(leafletmap);
+
+    var baseMaps = { "ESRI Oceans" : Esri_OceanBasemap };
+    var overlayMaps = { "US Faults": faults, "Plate Boundaries": plateBoundaries };
+
+    L.control.layers(baseMaps,overlayMaps).addTo(leafletmap);
     
     // APPEND the SVG to the Leaflet map pane
     svg = d3.select(leafletmap.getPanes().overlayPane).append("svg")
@@ -134,7 +153,13 @@ d3.quakeMap = function(options) {
     // g (group) element will be inside the svg, and will contain the earthquakes
     svg.append("g")
        .attr("class", "leaflet-zoom-hide");
-    
+
+    popupDiv = d3.selectAll(".leaflet-pane")
+              .filter(".leaflet-popup-pane")
+              .append("div")
+              .attr("class","tooltip")
+              .style("opacity", 0 );
+
     // add a magnitude legend to the bottom right control layer
     addMagnitudeLegend();
 
@@ -166,9 +191,7 @@ d3.quakeMap = function(options) {
 
   function removeEarthquakeCircles() {
     var exit = svg.select("g")
-        .selectAll("circle");
-    exit.selectAll("transition").remove();
-    exit.remove();
+        .selectAll("#earthquake-a").remove();
   }
 
   function renderEarthquakes() {
@@ -227,17 +250,41 @@ d3.quakeMap = function(options) {
         .selectAll("circle")
           .data(earthquakes, function(d) { return d.id; })
         .enter()
+          // append an <a> to provide a link upon click to the USGS url
+          .append("a")
+          // add the usgs link as an attribute
+          .attr("xlink:href", function(d) { return d.properties.url; })
+          // open link in new window
+          .attr("target","_blank")
+          .attr("id","earthquake-a")
           .append("circle")
           // here we translate LOCALLY within the svg, and, of course, we have to add the padding value to
           .attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")")
           .attr("class", "earthquake")
           .attr("cx", function(d) {
                         var ll = L.latLng(d.geometry.coordinates[1],d.geometry.coordinates[0]);
-                        return leafletmap.latLngToLayerPoint(ll).x; })
+                        d.x = leafletmap.latLngToLayerPoint(ll).x;
+                        return d.x; })
           .attr("cy", function(d) {
                         var ll = L.latLng(d.geometry.coordinates[1],d.geometry.coordinates[0]);
-                        return leafletmap.latLngToLayerPoint(ll).y; })
+                        d.y = leafletmap.latLngToLayerPoint(ll).y;
+                        return d.y; })
           .attr("r", 0)
+          .on("mouseover", function(d) {		
+              popupDiv.transition()		
+                  .duration(200)		
+                  .style("opacity", .9);		
+              popupDiv.html("Magnitude: <strong>" + d.properties.mag + "</strong><br/>"
+                        + "Depth: <strong>" + d.geometry.coordinates[2] + " km</strong><br/>"
+                        + "(click for info)" )	
+                       .style("left", (d.x+5) + "px")
+                       .style("top", (d.y-10) + "px");	
+              })					
+          .on("mouseout", function(d) {		
+              popupDiv.transition()		
+                  .duration(500)		
+                  .style("opacity", 0);
+              })
           .transition()
           .duration(500)
           .delay(function(d,i){ return 200*i; })
