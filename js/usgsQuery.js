@@ -37,6 +37,7 @@ var usgsQuery = (function(my) {
     query.push("maxlatitude=" + maxLat ); 
     query.push("minlongitude=" + minLong ); 
     query.push("maxlongitude=" + maxLong ); 
+    query.push("eventtype=" + params.eventType);
     
     query.push("orderby=time-asc"); // order in time ascending
     

@@ -8,6 +8,7 @@ d3.quakeMap = function(options) {
     , numDays = options.numDays < 1 ? 1 : options.numDays // number of days worth of earthquakes to display
     , mapCenter = options.mapCenter === undefined ? [47.598877, -122.330916] : options.mapCenter
     , mapZoomLevel = options.mapZoomLevel === undefined ? 5 : options.mapZoomLevel
+    , eventType = options.eventType === undefined ? "earthquake" : options.eventType
     , timeOut = null // timeout function to prevent map from repeatedly updating upon resize
     // --- leaflet stuff ---
     , leafletmap // the leaflet map
@@ -93,7 +94,22 @@ d3.quakeMap = function(options) {
     }
     return my;
   };
+  
+  my.eventType = function(value) {
+    if( !arguments.length ) return eventType;
 
+    eventType = value;
+    if( leafletmap !== undefined ) {
+      leafletmap.flyTo(mapCenter,mapZoomLevel,
+                          { "animate": true,
+                          "pan": {
+                              "duration": 5 
+                            }
+                          }
+                        );
+    }
+    return my;
+  };
 
   // initial map building method
   my.init = function() {
@@ -211,7 +227,9 @@ d3.quakeMap = function(options) {
    // build a query using the usgsQuery module
     var queryOptions = { endtime: quakeEndDate, 
                                numSeconds: 86400 * numDays, // 86400 seconds = 1 day, so query for past day's earthquakes
-                               leafletmap: leafletmap };
+                               leafletmap: leafletmap,
+                               eventType:  eventType
+                       };
     var eqQuery = usgsQuery.earthquakeURLMapBoundsJSON(queryOptions); 
     d3.json(eqQuery, function(err, json) {
      if (err) {

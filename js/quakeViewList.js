@@ -7,11 +7,12 @@ var quakeViews = [
       params: 
         {
           label: "Earthquakes in the last 24 hours",
-          longlabel: "USGS Earthquake feed of earthquakes in the past 24 hours. Lower magnitude events are filtered out by the USGS for non US-locations in the JSON feed." ,
+          longlabel: "USGS Earthquake feed of earthquakes in the past 24 hours (without explosions or quarry blasts)" ,
           center: [41.991341, -115.782354],
           zoom: 5,
           days: 1,
-          date: undefined 
+          date: undefined,
+          eventType: "earthquake"
         }
     }
     ,
@@ -20,11 +21,54 @@ var quakeViews = [
       params: 
         {
           label: "Earthquakes in the past week",
-          longlabel: "USGS Earthquake feed of earthquakes in the past 7 days. Lower magnitude events are filtered out by the USGS for non US-locations in the JSON feed.",
+          longlabel: "USGS Earthquake feed of earthquakes in the past 7 days (without explosions or quarry blasts)",
           center: [41.991341, -115.782354],
           zoom: 5,
           days: 7,
-          date: undefined 
+          date: undefined,
+          eventType: "earthquake"
+        }
+    }
+    ,
+    {
+      divId: 'west-coast-month', 
+      params: 
+        {
+          label: "Earthquakes in the past month",
+          longlabel: "USGS Earthquake feed of earthquakes in the past 30 days (without explosions or quarry blasts).",
+          center: [41.991341, -115.782354],
+          zoom: 5,
+          days: 30,
+          date: undefined,
+          eventType: "earthquake"
+        }
+    }
+    ,
+    {
+      divId: 'explosions-month', 
+      params: 
+        {
+          label: "Explosions in the last month",
+          longlabel: "Seismic events marked as 'explosions' by the USGS.",
+          center: [41.991341, -115.782354],
+          zoom: 5,
+          days: 30,
+          date: undefined,
+          eventType: "explosion"
+        }
+    }
+    ,
+    {
+      divId: 'quarry-explosions-month', 
+      params: 
+        {
+          label: "Quarry blasts in the last month",
+          longlabel: "Seismic events marked as 'quarry blast' by the USGS.",
+          center: [41.991341, -115.782354],
+          zoom: 5,
+          days: 30,
+          date: undefined,
+          eventType: "quarry blast"
         }
     }
     ,
@@ -37,7 +81,8 @@ var quakeViews = [
           center: [-39.827338, -73.247785],
           zoom: 6,
           days: 4,
-          date: "1960-05-25T23:59:59" 
+          date: "1960-05-25T23:59:59" ,
+          eventType: "earthquake"
         }
     }
     ,
@@ -51,7 +96,8 @@ var quakeViews = [
           center: [59.385651, -147.024957],
           zoom: 5,
           days: 4,
-          date: "1964-03-28T23:59:59"
+          date: "1964-03-28T23:59:59",
+          eventType: "earthquake"
         }
     }
     ,
@@ -64,7 +110,8 @@ var quakeViews = [
           center: [7.655104, 94.012632],
           zoom: 6,
           days: 3,
-          date: "2004-12-28T23:59:59"
+          date: "2004-12-28T23:59:59",
+          eventType: "earthquake"
         }
     }
     ,
@@ -77,7 +124,8 @@ var quakeViews = [
           center: [62.006110, -146.780242],
           zoom: 6,
           days: 4,
-          date: "2002-11-06T23:59:59"
+          date: "2002-11-06T23:59:59",
+          eventType: "earthquake"
         }
     }
   ];

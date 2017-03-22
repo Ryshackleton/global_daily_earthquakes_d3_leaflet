@@ -44,11 +44,12 @@ window.onload = function () {
                         var qDate = (v.params.date === undefined)
                                   ? new Date() 
                                   : new Date(v.params.date);
-
+      
                         quakemap.mapCenter(v.params.center)
                                 .mapZoomLevel(v.params.zoom)
                                 .numDays(v.params.days)
-                                .quakeEndDate(qDate);
+                                .quakeEndDate(qDate)
+                                .eventType(v.params.eventType);
 
                         });
     if( first === true ){
