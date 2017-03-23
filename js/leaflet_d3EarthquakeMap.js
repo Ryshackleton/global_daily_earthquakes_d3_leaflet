@@ -146,7 +146,7 @@ LEAFLET_CUSTOM.d3EarthquakeMap = function(options) {
       
       // add the new earthquake series
       svg.select("g")
-        .selectAll("circle")
+        .selectAll("a")
           .data(earthquakes, function(d) { return d.id; })
         .enter()
           // append an <a> to provide a link upon click to the USGS url
@@ -229,7 +229,7 @@ LEAFLET_CUSTOM.d3EarthquakeMap = function(options) {
                     .append("svg")
                   // size the element width to the size of the earthquake legend
                   .attr("width", lBottomRight[0] - lTopLeft[0] + 2*lPadding +"px")
-                  .attr("height", lBottomRight[1] - lTopLeft[1] + 2*lPadding + "px");
+                  .attr("height", lBottomRight[1] - lTopLeft[1] + 3*lPadding + "px");
   
     // g (group) element will be inside the legend svg, and will contain 
     // a bounding rectangle, some circles representing earthquake sizes, and text
