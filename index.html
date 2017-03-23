@@ -5,12 +5,17 @@
 		<meta charset="utf-8">
 		<title>Earthquake Visualizations</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      
+      	<!-- bootstrap & custom bootstrap template stylesheet -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/styles.css" rel="stylesheet">
-		<link href="css/quakeMap.css" rel="stylesheet">
-      		<!-- leaflet stylesheet -->
+      
+      	<!-- leaflet stylesheet -->
    		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 
+      	<!-- earthquake map stylesheet -->
+		<link href="css/leaflet_d3EarthquakeMap.css" rel="stylesheet">
+      
 	</head>
 	<body>
 
@@ -43,12 +48,12 @@
   <div class="row">
   	<div class="col-xs-4" id="left">
     
-      <h3>Earthquake sequences:</h3>
+      <h3>The Basic Map:</h3>
       
       <!-- item list (built by index.js with the views and earthquake sequences) -->
       <div id=earthquake-view-list></div>
-      <!-- /item list -->
       
+      <!-- /item list -->
       <p>
       <a href="https://github.com/Ryshackleton/global_daily_earthquakes_d3_leaflet">Source Code</a>
       </p>
@@ -66,13 +71,14 @@
     
   </div>
 </div>
+      
 <!-- end template -->
 
 	<!-- script references -->
     <!-- UI - bootstrap and jQuery -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+      
     <!-- D3.js version 4, and topojson for earthquake parsing/rendering -->
     <script src="https://d3js.org/d3.v4.min.js"></script> 
     <script src="https://d3js.org/topojson.v1.min.js"></script>
@@ -80,17 +86,14 @@
       <!-- leaflet js script to build the slippy map -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
-    <!-- module for querying the USGS earthquake REST API -->
-    <script src="js/usgsQuery.js"></script>
-    <!-- customized D3 earthquake overlay on slippy map module -->
-    <script src="js/quakeMap.js"></script>
-
-    <!-- list of different earthquake sequences defined by date, location,
-         and zoom level -->
-    <script src="js/quakeViewList.js"></script>
-
     <!-- main script to load this page and build the map and earthquake views -->
     <script src="js/index.js"></script>
+    <script src="js/leaflet_custom.js"></script>
+    <script src="js/leaflet_d3EarthquakeMap.js"></script>
+    <script src="js/usgsQuery.js"></script>
+    <script src="js/quakeViewList.js"></script>
+      
+      
 
 	</body>
 </html>
