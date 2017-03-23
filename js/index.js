@@ -13,8 +13,7 @@ window.onload = function() {
   
   // build a button and a click response for each view
   // (attached to a div with id='earthquake-view-list'
-  var first = true;
-  quakeViews.forEach(function(v){
+  quakeViews.forEach(function(v,i){
     // get the div that holds the earthquake buttons
     d3.select('#earthquake-view-list')
             .append('div')
@@ -46,9 +45,8 @@ window.onload = function() {
                    );
     
     // trigger the earthquake query for the first view in the list
-    if( first === true ){
+    if( i < 1){
       d3.select("#"+v.divId).on('click')();
-      first = false;
     }
   });
 };
