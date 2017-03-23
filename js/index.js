@@ -1,16 +1,16 @@
-// quakeViews defined externally in quakeViews.js 
-
-window.onload = function () {
-
+window.onload = function() {
   // build the quake map!
   var options = {
     mapDivTag: 'map-canvas',
-    numDays: 1 
   };
 
-  var quakemap = new d3.quakeMap(options);
-  quakemap.init();
-
+  var eqMap = new LEAFLET_CUSTOM.d3EarthquakeMap(options)
+                      .addESRIWorldImageryBaseMapLayer()
+                      .addESRIOceanBaseMapLayer()
+                      .addUSGSFaultsOverlay()
+                      .addTectonicPlateBoundariesOverlay()
+                      .addGeologicMapOverlay();
+  
   // build a button and a click response for each view
   // (attached to a div with id='earthquake-view-list'
   var first = true;
@@ -40,23 +40,16 @@ window.onload = function () {
                       {
                         d3.select('#events-title')
                             .text(v.params.label);
-
-                        var qDate = (v.params.date === undefined)
-                                  ? new Date() 
-                                  : new Date(v.params.date);
       
-                        quakemap.mapCenter(v.params.center)
-                                .mapZoomLevel(v.params.zoom)
-                                .numDays(v.params.days)
-                                .quakeEndDate(qDate)
-                                .eventType(v.params.eventType);
-
-                        });
+                        eqMap.setEarthquakeQuery(v.params);
+                      }
+                   );
+    
+    // trigger the earthquake query for the first view in the list
     if( first === true ){
       d3.select("#"+v.divId).on('click')();
       first = false;
     }
   });
-
 };
 
